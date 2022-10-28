@@ -3,6 +3,7 @@ import requests
 import json
 import re
 import datetime
+import database
 
 # TODO comment
 # TODO add logging
@@ -13,12 +14,11 @@ def save_to_db(db_client: pymongo.MongoClient, dataset: dict):
     # TODO implement
 
 
-def load_api_data(eva: str):
+def load_api_data(eva: str, db_client: pymongo.MongoClient):
     # get now
     now = datetime.datetime.now()
 
     # connect to database  # TODO
-    db_client = pymongo.MongoClient(host="mongodb://root:example@localhost:27017/")
     mydb = db_client["mydatabase"]
     print(db_client.list_database_names())
 
@@ -97,4 +97,5 @@ def load_api_data(eva: str):
 # Main entry point of main_db.py
 #################################
 if __name__ == '__main__':
-    load_api_data(eva="8000105")    # Frankfurt (Main) Hbf
+    database = database.connect()
+    load_api_data(eva="8000105", db_client=database)    # Frankfurt (Main) Hbf

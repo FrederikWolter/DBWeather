@@ -93,3 +93,5 @@ venv.bak/
 .idea/usage.statistics.xml
 .idea/shelf/*
 .idea/sonarlint/*
+
+config.py

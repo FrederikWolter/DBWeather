@@ -13,9 +13,9 @@ import database
 def save_to_db(db_client: pymongo.MongoClient, dataset: dict):
     print(dataset)
     # Select database
-    db = db_client["db"]
+    db = db_client["DBWeather"]
     # Select collection
-    collection = db["data"]
+    collection = db["data_train"]
     # Get the keys for this document
     keys = {
         "timestamp": dataset["timestamp"],

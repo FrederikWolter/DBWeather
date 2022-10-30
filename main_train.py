@@ -57,14 +57,14 @@ def load_api_data(eva: str):
 
     for line in lines:
         # time - line
-        if matches := re.fullmatch("(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
+        if matches := re.fullmatch(r"(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
             hour = matches.group("hour")
             minute = matches.group("minute")
             timestamp = now.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+02:00"
             dataset["timestamp"] = timestamp
 
         # connection - line
-        elif matches := re.fullmatch("(?P<type>[A-Za-z]+)([ \t]*)(?P<line>[A-Z0-9]+)", string=line):
+        elif matches := re.fullmatch(r"(?P<type>[A-Za-z]+)([ \t]*)(?P<line>[A-Z0-9]+)", string=line):
             dataset["con_type"] = matches.group("type")
             dataset["con_line"] = matches.group("line")
 
@@ -82,7 +82,7 @@ def load_api_data(eva: str):
                 assert False
 
             # save processed dataset
-            save_to_db(db=dataset, dataset=dataset)
+            save_to_db(db=database, dataset=dataset)
             dataset = {}
 
         # error - line not recognized
@@ -91,8 +91,6 @@ def load_api_data(eva: str):
             assert False
 
         # print(line)
-
-    print(json.dumps({"c": 0, "b": 0, "a": 0}, sort_keys=True))  # TODO test
     # endregion
 
 

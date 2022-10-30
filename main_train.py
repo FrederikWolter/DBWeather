@@ -1,32 +1,29 @@
-import pymongo
 import requests
 import json
 import re
 import datetime
-import database
+from database import Database
 
 
 # TODO comment
 # TODO add logging
 
 
-def save_to_db(db_client: pymongo.MongoClient, dataset: dict):
-    print(dataset)
-    # Select database
-    db = db_client["DBWeather"]
-    # Select collection
-    collection = db["data_train"]
-    # Get the keys for this document
+def save_to_db(db: Database, dataset: dict):
+    print(dataset)  # TODO temp
+
+    # get keys for this dataset
     keys = {
         "timestamp": dataset["timestamp"],
         "con_type": dataset["con_type"],
         "con_line": dataset["con_line"]
     }
-    # Update or insert the document to the database
-    database.insert_or_update(collection, keys, dataset)
+
+    # save (update or insert) the dataset to the database
+    db.upsert(db.mongo_data_train, keys, dataset)
 
 
-def load_api_data(eva: str, db_client: pymongo.MongoClient):
+def load_api_data(eva: str):
     # get now
     now = datetime.datetime.now()
 
@@ -85,7 +82,7 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
                 assert False
 
             # save processed dataset
-            save_to_db(db_client=db_client, dataset=dataset)
+            save_to_db(db=dataset, dataset=dataset)
             dataset = {}
 
         # error - line not recognized
@@ -99,10 +96,13 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
     # endregion
 
 
-#################################
+###################################
 # Main entry point of main_train.py
-#################################
+# call with "TODO Command cron?"
+###################################
 if __name__ == '__main__':
-    database_client = database.connect()
-    load_api_data(eva="8000105", db_client=database_client)  # Frankfurt (Main) Hbf
+    database = Database()
+    load_api_data(eva="8000105")  # Frankfurt (Main) Hbf
+
     #database_client.db.data.delete_many({})  # delete all data from the db collection
+    database.close()

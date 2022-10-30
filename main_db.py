@@ -12,7 +12,18 @@ import database
 
 def save_to_db(db_client: pymongo.MongoClient, dataset: dict):
     print(dataset)
-    # TODO implement
+    # Select database
+    db = db_client["db"]
+    # Select collection
+    collection = db["data"]
+    # Get the keys for this document
+    keys = {
+        "timestamp": dataset["timestamp"],
+        "con_type": dataset["con_type"],
+        "con_line": dataset["con_line"]
+    }
+    # Update or insert the document to the database
+    database.insert_or_update(collection, keys, dataset)
 
 
 def load_api_data(eva: str, db_client: pymongo.MongoClient):
@@ -20,7 +31,6 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
     now = datetime.datetime.now()
 
     # connect to database  # TODO
-    mydb = db_client["mydatabase"]
     print(db_client.list_database_names())
 
     # request api
@@ -29,8 +39,8 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
         "L": "vs_java",  # TODO what?
         "start": "yes",  # TODO what?
         "boardType": "dep",  # TODO arr or dep
-        "date": "29.10.22",  # TODO make dynamic
-        "time": "10:00",  # TODO make dynamic
+        "date": "30.10.22",  # TODO make dynamic
+        "time": "16:30",  # TODO make dynamic
         "input": eva
     }
     headers = {}
@@ -98,5 +108,6 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
 # Main entry point of main_db.py
 #################################
 if __name__ == '__main__':
-    database = database.connect()
-    load_api_data(eva="8000105", db_client=database)  # Frankfurt (Main) Hbf
+    database_client = database.connect()
+    load_api_data(eva="8000105", db_client=database_client)  # Frankfurt (Main) Hbf
+    #database_client.db.data.remove({})  # delete all data from the db collection

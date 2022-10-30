@@ -10,17 +10,21 @@ from database import Database
 
 
 def save_to_db(db: Database, dataset: dict):
-    print(dataset)  # TODO temp
+    try:
+        print(dataset)  # TODO temp
 
-    # get keys for this dataset
-    keys = {
-        "timestamp": dataset["timestamp"],
-        "con_type": dataset["con_type"],
-        "con_line": dataset["con_line"]
-    }
+        # get keys for this dataset
+        keys = {
+            "timestamp": dataset["timestamp"],
+            "con_type": dataset["con_type"],
+            "con_line": dataset["con_line"]
+        }
 
-    # save (update or insert) the dataset to the database
-    db.upsert(db.mongo_data_train, keys, dataset)
+        # save (update or insert) the dataset to the database
+        db.upsert(db.mongo_data_train, keys, dataset)
+    except KeyError as e:
+        # TODO logging
+        print("Upsert Error")
 
 
 def load_api_data(eva: str):
@@ -54,6 +58,7 @@ def load_api_data(eva: str):
     lines = lines[1:]  # drop first line including the header information
 
     dataset = {}
+    i =0
 
     for line in lines:
         # time - line
@@ -83,15 +88,17 @@ def load_api_data(eva: str):
 
             # save processed dataset
             save_to_db(db=database, dataset=dataset)
+            i += 1
             dataset = {}
 
         # error - line not recognized
         else:
-            print("Error")
-            assert False
+            print("Error: ", line, dataset)
+            #assert False
 
-        # print(line)
+        #print(line)
     # endregion
+    print(i)
 
 
 ###################################
@@ -102,5 +109,5 @@ if __name__ == '__main__':
     database = Database()
     load_api_data(eva="8000105")  # Frankfurt (Main) Hbf
 
-    #database_client.db.data.delete_many({})  # delete all data from the db collection
+    #database.mongo_data_train.delete_many({})  # delete all data from the db collection
     database.close()

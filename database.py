@@ -27,7 +27,7 @@ class Database:
         self.mongo_data_train = self.mongo_db[cfg.mongodb["data_train"]]
         self.mongo_data_weather = self.mongo_db[cfg.mongodb["data_weather"]]
 
-    def upsert(self, collection: pymongo.collection, query: dict, update: dict):
+    def upsert(self, collection: pymongo.collection, query: dict, update: dict):    # TODO fix collection reference and return
         """
         Saves a dataset inside a passed collection.
         Depending on the result of the query a new dataset is added or an existing is updated.
@@ -44,6 +44,7 @@ class Database:
         """
 
         return collection.update_one(query, {"$set": update}, upsert=True)
+        #return collection.insert_one(update)   # TODO for testing
 
     def close(self) -> None:
         """

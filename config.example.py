@@ -1,3 +1,6 @@
+# TODO comment
+# TODO move to sub dir?
+
 # Config file for the DBWeather Application
 mongodb = {
     # The hostname of the mongodb

@@ -102,7 +102,7 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
 
 
 #################################
-# Main entry point of main_db.py
+# Main entry point of main_train.py
 #################################
 if __name__ == '__main__':
     database_client = database.connect()

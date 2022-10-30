@@ -30,9 +30,6 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
     # get now
     now = datetime.datetime.now()
 
-    # connect to database  # TODO
-    print(db_client.list_database_names())
-
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {

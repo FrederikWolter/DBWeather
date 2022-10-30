@@ -37,7 +37,7 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
         "start": "yes",  # TODO what?
         "boardType": "dep",  # TODO arr or dep
         "date": "30.10.22",  # TODO make dynamic
-        "time": "16:30",  # TODO make dynamic
+        "time": "20:00",  # TODO make dynamic
         "input": eva
     }
     headers = {}
@@ -60,18 +60,16 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
 
     for line in lines:
         # time - line
-        if re.fullmatch(pattern=r"[0-2][0-9]:[0-6][0-9]", string=line) is not None:
-            hour = line.split(":")[0]
-            minute = line.split(":")[1]
+        if matches := re.fullmatch("(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
+            hour = matches.group("hour")
+            minute = matches.group("minute")
             timestamp = now.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+02:00"
             dataset["timestamp"] = timestamp
 
         # connection - line
-        elif re.fullmatch(pattern=r"[A-Za-z]+[ \t]*[A-Z0-9]+", string=line) is not None:
-            con_type = line.split(sep=" ")[0]
-            con_line = line.split(sep=" ")[-1]
-            dataset["con_type"] = con_type
-            dataset["con_line"] = con_line
+        elif matches := re.fullmatch("(?P<type>[A-Za-z]+)([ \t]*)(?P<line>[A-Z0-9]+)", string=line):
+            dataset["con_type"] = matches.group("type")
+            dataset["con_line"] = matches.group("line")
 
         # changes - line
         elif re.fullmatch(pattern=r"cancel|no|0|\+\s[0-9]+", string=line) is not None:

@@ -107,4 +107,4 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
 if __name__ == '__main__':
     database_client = database.connect()
     load_api_data(eva="8000105", db_client=database_client)  # Frankfurt (Main) Hbf
-    #database_client.db.data.remove({})  # delete all data from the db collection
+    #database_client.db.data.delete_many({})  # delete all data from the db collection

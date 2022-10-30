@@ -38,7 +38,7 @@ def load_api_data(eva: str):
         "start": "yes",  # TODO what?
         "boardType": "dep",  # TODO arr or dep
         "date": "30.10.22",  # TODO make dynamic
-        "time": "20:00",  # TODO make dynamic
+        "time": "23:00",  # TODO make dynamic
         "input": eva
     }
     headers = {}
@@ -58,7 +58,7 @@ def load_api_data(eva: str):
     lines = lines[1:]  # drop first line including the header information
 
     dataset = {}
-    i =0
+    i = 0
 
     for line in lines:
         # time - line
@@ -74,14 +74,13 @@ def load_api_data(eva: str):
             dataset["con_line"] = matches.group("line")
 
         # changes - line
-        elif re.fullmatch(pattern=r"cancel|no|0|\+\s[0-9]+", string=line) is not None:
-            if line == "cancel":
+        elif matches := re.fullmatch(r"(?P<cancel>cancel)|(?P<zero>no|0)|(\+\s*(?P<delay>[0-9]+))", string=line):
+            if matches.group("cancel"):
                 dataset["delay"] = -1
-            elif line == "no" or line == "0":
+            elif matches.group("zero"):
                 dataset["delay"] = 0
-            elif line.startswith("+"):
-                delay = re.search(pattern="[0-9]+", string=line).group(0)
-                dataset["delay"] = int(delay)
+            elif matches.group("delay"):
+                dataset["delay"] = int(matches.group("delay"))
             else:
                 print("Error ln 3")
                 assert False
@@ -94,9 +93,9 @@ def load_api_data(eva: str):
         # error - line not recognized
         else:
             print("Error: ", line, dataset)
-            #assert False
+            # assert False
 
-        #print(line)
+        # print(line)
     # endregion
     print(i)
 
@@ -109,5 +108,5 @@ if __name__ == '__main__':
     database = Database()
     load_api_data(eva="8000105")  # Frankfurt (Main) Hbf
 
-    #database.mongo_data_train.delete_many({})  # delete all data from the db collection
+    # database.mongo_data_train.delete_many({})  # delete all data from the db collection
     database.close()

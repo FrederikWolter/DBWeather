@@ -5,6 +5,7 @@ import re
 import datetime
 import database
 
+
 # TODO comment
 # TODO add logging
 
@@ -25,14 +26,14 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {
-        "L": "vs_java",         # TODO what?
-        "start": "yes",         # TODO what?
-        "boardType": "dep",     # TODO arr or dep
-        "date": "28.10.22",     # TODO make dynamic
-        "time": "19:00",        # TODO make dynamic
+        "L": "vs_java",  # TODO what?
+        "start": "yes",  # TODO what?
+        "boardType": "dep",  # TODO arr or dep
+        "date": "29.10.22",  # TODO make dynamic
+        "time": "10:00",  # TODO make dynamic
         "input": eva
     }
-    headers = { }
+    headers = {}
     r = requests.get(url=url, params=params, headers=headers, timeout=10)
 
     # request successful?
@@ -46,7 +47,7 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
     # region process answer
     # get individual lines
     lines = answer.splitlines()
-    lines = lines[1:]               # drop first line including the header information
+    lines = lines[1:]  # drop first line including the header information
 
     dataset = {}
 
@@ -98,4 +99,4 @@ def load_api_data(eva: str, db_client: pymongo.MongoClient):
 #################################
 if __name__ == '__main__':
     database = database.connect()
-    load_api_data(eva="8000105", db_client=database)    # Frankfurt (Main) Hbf
+    load_api_data(eva="8000105", db_client=database)  # Frankfurt (Main) Hbf

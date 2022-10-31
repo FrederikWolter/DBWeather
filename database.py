@@ -13,7 +13,8 @@ class Database:
         """
 
         # build the connection string
-        host = "mongodb://" + cfg.mongodb["user"] + ":" + cfg.mongodb["pwd"] + "@" + cfg.mongodb["host"] + ":" + cfg.mongodb["port"]
+        host = "mongodb://" + cfg.mongodb["user"] + ":" + cfg.mongodb["pwd"] + "@" + \
+               cfg.mongodb["host"] + ":" + cfg.mongodb["port"]
 
         # build connection
         self.mongo_client = pymongo.MongoClient(
@@ -28,7 +29,8 @@ class Database:
         self.mongo_data_train = self.mongo_db[cfg.mongodb["data_train"]]
         self.mongo_data_weather = self.mongo_db[cfg.mongodb["data_weather"]]
 
-    def upsert(self, collection: pymongo.collection, query: dict, update: dict):    # TODO fix collection reference and return
+    @staticmethod
+    def upsert(collection: pymongo.collection.Collection, query: dict, update: dict) -> None:
         """
         Saves a dataset inside a passed collection.
         Depending on the result of the query a new dataset is added or an existing is updated.
@@ -38,14 +40,13 @@ class Database:
             - update = { "name": "Test", "message": "First Document updated" }
             - Is there a dataset with name = Test? Update this dataset or insert it.
 
-        :param collection: The collection to be used
-        :param query: A dict including keys of the item to upsert
-        :param update: A dict including all the data, which should be updated
-        :returns: The updated or inserted item
+        :param collection: collection to be used
+        :param query: dict with keys of the item to upsert
+        :param update: dict with all data, which should be updated
         """
 
-        return collection.update_one(query, {"$set": update}, upsert=True)
-        #return collection.insert_one(update)   # TODO for testing
+        collection.update_one(query, {"$set": update}, upsert=True)
+        # TODO logging use result
 
     def close(self) -> None:
         """

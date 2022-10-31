@@ -20,7 +20,8 @@ def save_to_db(db: Database, dataset: dict):
         }
 
         # save (update or insert) the dataset to the database
-        db.upsert(db.mongo_data_train, keys, dataset)
+        Database.upsert(db.mongo_data_train, keys, dataset)
+
     except KeyError as e:
         # TODO logging
         print("Upsert Error")

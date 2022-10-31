@@ -45,3 +45,6 @@ venv.bak/
 
 # configuration with secret keys
 config.py
+
+# logs
+*.log

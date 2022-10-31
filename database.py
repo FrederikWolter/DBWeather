@@ -1,16 +1,18 @@
+import logging
 import pymongo
 import config as cfg
 
 
 # TODO comment
-# TODO add logging
-
 
 class Database:
     def __init__(self):
         """
         Connect to the mongodb-database and create references to the relevant collections.
         """
+
+        # get logger
+        self.logger = logging.getLogger("train.database")
 
         # build the connection string
         host = "mongodb://" + cfg.mongodb["user"] + ":" + cfg.mongodb["pwd"] + "@" + \

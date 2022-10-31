@@ -12,7 +12,7 @@ class Database:
         """
 
         # get logger
-        self.logger = logging.getLogger("train.database")
+        self.logger = logging.getLogger("database")
 
         # build the connection string
         host = "mongodb://" + cfg.mongodb["user"] + ":" + cfg.mongodb["pwd"] + "@" + \

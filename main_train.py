@@ -109,6 +109,7 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
         else:
             logger.error("Not recognized line: '%s' with dataset '%s'", line, dataset)
     # endregion
+    # TODO save eva in dataset
 
 
 ###################################

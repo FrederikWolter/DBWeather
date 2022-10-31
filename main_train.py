@@ -27,7 +27,7 @@ def save_to_db(db: Database, dataset: dict):
         print("Upsert Error")
 
 
-def load_api_data(eva: str, current_time: datetime):
+def load_api_data(eva: str, current_time: datetime.datetime):
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {

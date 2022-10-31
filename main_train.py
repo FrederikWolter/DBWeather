@@ -33,7 +33,9 @@ def save_to_db(db: Database, dataset: dict):
         global num_inserted
         num_inserted += 1 - result.matched_count
         global num_updated
-        num_updated += result.matched_count
+        num_updated += result.modified_count
+        global num_unchanged
+        num_unchanged += not result.modified_count and result.matched_count
 
     except KeyError:
         logger.exception("Given dataset missing key(s):")
@@ -133,6 +135,8 @@ if __name__ == '__main__':
     num_inserted = 0
     global num_updated
     num_updated = 0
+    global num_unchanged
+    num_unchanged = 0
 
     # setup database connection and load data
     database = Database()
@@ -143,5 +147,5 @@ if __name__ == '__main__':
     database.close()
     #database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 
-    logger.info("finished: %s inserted, %s updated", num_inserted, num_updated)
+    logger.info("finished: %s inserted, %s updated, %s unchanged", num_inserted, num_updated, num_unchanged)
     logger.info("###########################################")

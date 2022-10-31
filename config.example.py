@@ -1,5 +1,4 @@
 # TODO comment
-# TODO sync with config.py
 
 # Config file for the DBWeather Application
 

@@ -27,7 +27,13 @@ def save_to_db(db: Database, dataset: dict):
         }
 
         # save (update or insert) the dataset to the database
-        Database.upsert(db.mongo_data_train, keys, dataset)
+        result = database.upsert(collection=db.mongo_data_train, query=keys, update=dataset)
+
+        # update stats
+        global num_inserted
+        num_inserted += 1 - result.matched_count
+        global num_updated
+        num_updated += result.matched_count
 
     except KeyError:
         logger.exception("Given dataset missing key(s):")
@@ -65,7 +71,7 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
     # get individual lines
     lines = answer.splitlines()
     lines = lines[1:]  # drop first line with header information
-    logger.debug("Result has %s line, calculated %s datasets", len(lines), len(lines) / 3)
+    logger.info("Result has %s line, calculated %s datasets", len(lines), len(lines) / 3)
 
     dataset = {"board_type": board_type.value}
 
@@ -122,6 +128,12 @@ if __name__ == '__main__':
     # get now
     now = datetime.datetime.now()
 
+    # setup counter
+    global num_inserted
+    num_inserted = 0
+    global num_updated
+    num_updated = 0
+
     # setup database connection and load data
     database = Database()
     logger.debug("Start processing Frankfurt (Main) Hbf arrivals ...")
@@ -129,6 +141,7 @@ if __name__ == '__main__':
     logger.debug("Start processing Frankfurt (Main) Hbf departures ...")
     load_api_data(eva="8000105", current_time=now, board_type=BoardType.DEPARTURE)
     database.close()
-    # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
+    #database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 
-    logger.info("finished ###########################################")
+    logger.info("finished: %s inserted, %s updated", num_inserted, num_updated)
+    logger.info("###########################################")

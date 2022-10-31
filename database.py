@@ -1,5 +1,8 @@
 import logging
 import pymongo
+import pymongo.errors
+import pymongo.results as mongo_results
+import pymongo.collection as mongo_collection
 import config as cfg
 
 
@@ -31,8 +34,7 @@ class Database:
         self.mongo_data_train = self.mongo_db[cfg.mongodb["data_train"]]
         self.mongo_data_weather = self.mongo_db[cfg.mongodb["data_weather"]]
 
-    @staticmethod
-    def upsert(collection: pymongo.collection.Collection, query: dict, update: dict) -> None:
+    def upsert(self, collection: mongo_collection.Collection, query: dict, update: dict) -> mongo_results.UpdateResult:
         """
         Saves a dataset inside a passed collection.
         Depending on the result of the query a new dataset is added or an existing is updated.
@@ -47,8 +49,10 @@ class Database:
         :param update: dict with all data, which should be updated
         """
 
-        collection.update_one(query, {"$set": update}, upsert=True)
-        # TODO logging use result
+        try:
+            return collection.update_one(query, {"$set": update}, upsert=True)
+        except pymongo.errors.DuplicateKeyError as e:
+            self.logger.exception("Error upsert '%s'", e.details)
 
     def close(self) -> None:
         """

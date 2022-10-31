@@ -27,10 +27,7 @@ def save_to_db(db: Database, dataset: dict):
         print("Upsert Error")
 
 
-def load_api_data(eva: str):
-    # get now
-    now = datetime.datetime.now()
-
+def load_api_data(eva: str, current_time: datetime):
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {
@@ -41,9 +38,9 @@ def load_api_data(eva: str):
         # show arrival ['arr'] or departure ['dep'] information # TODO arr or dep, both?
         "boardType": "dep",
         # date to look at ['DD.MM.YY']
-        "date": now.strftime("%d.%m.%y"),
+        "date": current_time.strftime("%d.%m.%y"),
         # time to look at ['HH:MM'] (server returns information around specified time)
-        "time": now.strftime("%H:%M"),
+        "time": current_time.strftime("%H:%M"),
         # train station eva-number
         "input": eva
     }
@@ -71,7 +68,7 @@ def load_api_data(eva: str):
         if matches := re.fullmatch(r"(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
             hour = matches.group("hour")
             minute = matches.group("minute")
-            timestamp = now.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+01:00"  # it's +1 now ("WINTERZEIT")
+            timestamp = current_time.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+01:00"  # it's +1 now
             dataset["timestamp"] = timestamp
 
         # connection - line
@@ -112,7 +109,11 @@ def load_api_data(eva: str):
 ###################################
 if __name__ == '__main__':
     database = Database()
-    load_api_data(eva="8000105")  # Frankfurt (Main) Hbf
+
+    # get now
+    now = datetime.datetime.now()
+
+    load_api_data(eva="8000105", current_time=now)  # Frankfurt (Main) Hbf
 
     # database.mongo_data_train.delete_many({})  # delete all data from the db collection
     database.close()

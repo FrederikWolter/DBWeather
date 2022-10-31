@@ -1,5 +1,6 @@
-import config as cfg
 import pymongo
+import config as cfg
+
 
 # TODO comment
 # TODO add logging

@@ -1,5 +1,4 @@
 # TODO comment
-# TODO move to sub dir?
 # TODO sync with config.py
 
 # Config file for the DBWeather Application

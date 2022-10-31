@@ -1,7 +1,6 @@
-import requests
-import json
-import re
 import datetime
+import re
+import requests
 from database import Database
 
 

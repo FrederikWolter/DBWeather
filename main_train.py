@@ -34,11 +34,17 @@ def load_api_data(eva: str):
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {
-        "L": "vs_java",  # TODO what?
-        "start": "yes",  # TODO what?
-        "boardType": "dep",  # TODO arr or dep
-        "date": "30.10.22",  # TODO make dynamic
-        "time": "23:00",  # TODO make dynamic
+        # format expected from server (otherwise html page)
+        "L": "vs_java",
+        # impact not apparent (but error without)
+        "start": "yes",
+        # show arrival ['arr'] or departure ['dep'] information # TODO arr or dep, both?
+        "boardType": "dep",
+        # date to look at ['DD.MM.YY']
+        "date": now.strftime("%d.%m.%y"),
+        # time to look at ['HH:MM'] (server returns information around specified time)
+        "time": now.strftime("%H:%M"),
+        # train station eva-number
         "input": eva
     }
     headers = {}

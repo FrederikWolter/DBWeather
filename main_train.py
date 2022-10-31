@@ -71,7 +71,7 @@ def load_api_data(eva: str):
         if matches := re.fullmatch(r"(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
             hour = matches.group("hour")
             minute = matches.group("minute")
-            timestamp = now.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+02:00"
+            timestamp = now.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+01:00"  # it's +1 now ("WINTERZEIT")
             dataset["timestamp"] = timestamp
 
         # connection - line

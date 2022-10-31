@@ -3,9 +3,15 @@ import re
 import requests
 import logging
 from database import Database
+from enum import Enum
 
 
 # TODO comment
+
+
+class BoardType(Enum):
+    ARRIVAL = "arr"
+    DEPARTURE = "dep"
 
 
 def save_to_db(db: Database, dataset: dict):
@@ -14,6 +20,7 @@ def save_to_db(db: Database, dataset: dict):
 
         # get keys for this dataset
         keys = {
+            "board_type": dataset["board_type"],
             "timestamp": dataset["timestamp"],
             "con_type": dataset["con_type"],
             "con_line": dataset["con_line"]
@@ -27,7 +34,7 @@ def save_to_db(db: Database, dataset: dict):
         print("Upsert Error")
 
 
-def load_api_data(eva: str, current_time: datetime.datetime):
+def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardType):
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {
@@ -36,8 +43,7 @@ def load_api_data(eva: str, current_time: datetime.datetime):
         # impact not apparent (but error without)
         "start": "yes",
         # show arrival ['arr'] or departure ['dep'] information
-        # TODO arr or dep, both?
-        "boardType": "dep",
+        "boardType": board_type.value,
         # date to look at ['DD.MM.YY']
         "date": current_time.strftime("%d.%m.%y"),
         # time to look at ['HH:MM'] (server returns information around specified time)
@@ -61,7 +67,7 @@ def load_api_data(eva: str, current_time: datetime.datetime):
     lines = lines[1:]  # drop first line with header information
     logger.debug("Result has %s line, calculated %s datasets", len(lines), len(lines) / 3)
 
-    dataset = {}
+    dataset = {"board_type": board_type.value}
 
     # parse lines
     for line in lines:
@@ -89,7 +95,7 @@ def load_api_data(eva: str, current_time: datetime.datetime):
 
             # save processed dataset
             save_to_db(db=database, dataset=dataset)
-            dataset = {}
+            dataset = {"board_type": board_type.value}  # reset dataset
 
         # error - line not recognized
         else:
@@ -118,8 +124,10 @@ if __name__ == '__main__':
 
     # setup database connection and load data
     database = Database()
-    logger.debug("Start processing Frankfurt (Main) Hbf in arr ...")
-    load_api_data(eva="8000105", current_time=now)  # Frankfurt (Main) Hbf arrival
+    logger.debug("Start processing Frankfurt (Main) Hbf arrivals ...")
+    load_api_data(eva="8000105", current_time=now, board_type=BoardType.ARRIVAL)
+    logger.debug("Start processing Frankfurt (Main) Hbf departures ...")
+    load_api_data(eva="8000105", current_time=now, board_type=BoardType.DEPARTURE)
     database.close()
     # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 

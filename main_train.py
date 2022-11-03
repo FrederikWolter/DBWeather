@@ -23,6 +23,7 @@ def save_to_db(db: Database, dataset: dict):
 
         # get keys for this dataset
         keys = {
+            "eva": dataset["eva"],
             "board_type": dataset["board_type"],
             "timestamp": dataset["timestamp"],
             "con_type": dataset["con_type"],
@@ -78,7 +79,11 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
     lines = lines[1:]  # drop first line with header information
     logger.info("Result has %s line, calculated %s datasets", len(lines), len(lines) / 3)
 
-    dataset = {"board_type": board_type.value}
+    # prefill dataset
+    dataset = {
+        "eva": eva,
+        "board_type": board_type.value
+    }
 
     # parse lines
     for line in lines:
@@ -106,7 +111,12 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
 
             # save processed dataset
             save_to_db(db=database, dataset=dataset)
-            dataset = {"board_type": board_type.value}  # reset dataset
+
+            # reset dataset
+            dataset = {
+                "eva": eva,
+                "board_type": board_type.value
+            }
 
         # error - line not recognized
         else:

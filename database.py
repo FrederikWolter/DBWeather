@@ -8,12 +8,14 @@ import pymongo.results as mongo_results
 import config as cfg
 
 
-# TODO comment
-
 class Database:
+    """
+    Class representing a connection to the application's mongodb database.
+    """
+
     def __init__(self):
         """
-        Connect to the mongodb-database and create references to the relevant collections.
+        Connect to the mongodb database and create references to the relevant collections.
         """
 
         # get logger
@@ -30,6 +32,8 @@ class Database:
             tz_aware=True,
             connect=True,
         )
+
+        # get database
         self.mongo_db = self.mongo_client[cfg.mongodb["db"]]
 
         # get collections
@@ -38,7 +42,7 @@ class Database:
 
     def upsert(self, collection: mongo_collection.Collection, query: dict, update: dict) -> mongo_results.UpdateResult:
         """
-        Saves a dataset inside a passed collection.
+        Saves a dataset inside the passed collection.
         Depending on the result of the query a new dataset is added or an existing is updated.
 
         Example usage:
@@ -52,13 +56,13 @@ class Database:
         """
 
         try:
-            return collection.update_one(query, {"$set": update}, upsert=True)
+            return collection.update_one(filter=query, update={"$set": update}, upsert=True)
         except pymongo.errors.DuplicateKeyError as e:
             self.logger.exception("Error upsert '%s'", e.details)
 
     def close(self) -> None:
         """
-        Close all connections to the mongodb-database.upsert
+        Close all connections to the mongodb-database.
         :return: None
         """
         self.mongo_client.close()

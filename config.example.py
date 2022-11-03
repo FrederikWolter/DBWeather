@@ -1,5 +1,3 @@
-# TODO comment
-
 # Config file for the DBWeather Application
 
 # config values for database connection
@@ -12,10 +10,11 @@ mongodb = {
     "user": "root",
     # password of the user for the mongodb
     "pwd": "example",
+
     # database name used by the application
     "db": "DBWeather",
 
-    # collections
+    # collections used by the application
     "data_train": "data_train",
     "data_weather": "data_weather"
 }

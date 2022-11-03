@@ -1,7 +1,8 @@
 import datetime
-import re
-import requests
 import logging
+
+import requests
+
 from database import Database
 
 
@@ -101,7 +102,7 @@ if __name__ == '__main__':
     logger.debug("Start processing Frankfurt (Main) weather data ...")
     load_api_data(lat=50.05, lon=8.6, current_time=now)
     database.close()
-    #database.mongo_data_weather.delete_many({})  # delete all data from the db collection # TODO
+    # database.mongo_data_weather.delete_many({})  # delete all data from the db collection # TODO
 
     logger.info("finished: %s inserted, %s updated, %s unchanged", num_inserted, num_updated, num_unchanged)
     logger.info("###########################################")

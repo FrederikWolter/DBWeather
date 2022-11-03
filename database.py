@@ -1,8 +1,10 @@
 import logging
+
 import pymongo
+import pymongo.collection as mongo_collection
 import pymongo.errors
 import pymongo.results as mongo_results
-import pymongo.collection as mongo_collection
+
 import config as cfg
 
 

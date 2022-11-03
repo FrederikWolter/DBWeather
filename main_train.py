@@ -1,9 +1,11 @@
 import datetime
-import re
-import requests
 import logging
-from database import Database
+import re
 from enum import Enum
+
+import requests
+
+from database import Database
 
 
 # TODO comment
@@ -93,7 +95,7 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
         # changes - line
         elif matches := re.fullmatch(r"(?P<cancel>cancel)|(?P<zero>no|0)|(\+\s*(?P<delay>[0-9]+))", string=line):
             if matches.group("cancel"):
-                dataset["delay"] = -1   # -1 representing canceled
+                dataset["delay"] = -1  # -1 representing canceled
             elif matches.group("zero"):
                 dataset["delay"] = 0
             elif matches.group("delay"):
@@ -146,7 +148,7 @@ if __name__ == '__main__':
     logger.debug("Start processing Frankfurt (Main) Hbf departures ...")
     load_api_data(eva="8000105", current_time=now, board_type=BoardType.DEPARTURE)
     database.close()
-    #database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
+    # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 
     logger.info("finished: %s inserted, %s updated, %s unchanged", num_inserted, num_updated, num_unchanged)
     logger.info("###########################################")

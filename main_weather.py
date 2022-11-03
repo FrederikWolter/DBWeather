@@ -1,8 +1,8 @@
 import datetime
 import logging
-from pytz import timezone
 
 import requests
+from pytz import timezone
 
 from database import Database
 
@@ -69,14 +69,14 @@ def _load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> N
     # request successful?
     if r.status_code != 200:
         logger.critical("Request return unexpected exit code '%s'", r.status_code)
-        assert False    # exit with a big bang
+        assert False  # exit with a big bang
 
     # region process answer
     answer = r.json()
 
     # get only weather data
     weather = answer['weather']
-    logger.info("Result has %s elements", len(weather))
+    logger.info("Result lat=%s lon=%s has %s elements", lat, lon, len(weather))
 
     # save processed dataset
     for dataset in weather:
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         filemode="a",
         format='%(asctime)s %(levelname)-7s %(name)s: %(message)s',
         encoding='utf-8',
-        level=logging.DEBUG
+        level=logging.INFO
     )
     logger = logging.getLogger("weather")
     logger.info("Start main_weather execution ...")
@@ -115,6 +115,9 @@ if __name__ == '__main__':
 
     logger.debug("Start processing Frankfurt (Main) weather data ...")
     _load_api_data(lat=50.05, lon=8.6, current_time=now)
+
+    logger.debug("Start processing Mannheim weather data ...")
+    _load_api_data(lat=49.5, lon=8.48, current_time=now)
 
     database.close()
     # database.mongo_data_weather.delete_many({})  # delete all data from the db collection # TODO

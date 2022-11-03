@@ -2,9 +2,9 @@ import datetime
 import logging
 import re
 from enum import Enum
-from pytz import timezone
 
 import requests
+from pytz import timezone
 
 from database import Database
 
@@ -85,7 +85,7 @@ def _load_api_data(eva: int, current_time: datetime.datetime, board_type: BoardT
     # request successful?
     if r.status_code != 200:
         logger.critical("Request return unexpected exit code '%s'", r.status_code)
-        assert False    # exit with a big bang
+        assert False  # exit with a big bang
 
     # region process answer
     answer = r.text
@@ -93,7 +93,7 @@ def _load_api_data(eva: int, current_time: datetime.datetime, board_type: BoardT
     # get individual lines
     lines = answer.splitlines()
     lines = lines[1:]  # drop first line with header information
-    logger.info("Result has %s line, calculated %s datasets", len(lines), len(lines) / 3)
+    logger.info("Result eva=%s type=%s has %s lines, calc %s sets", eva, board_type.value, len(lines), len(lines) / 3)
 
     # prefill dataset
     dataset = {
@@ -151,7 +151,7 @@ if __name__ == '__main__':
         filemode="a",
         format='%(asctime)s %(levelname)-7s %(name)s: %(message)s',
         encoding='utf-8',
-        level=logging.DEBUG
+        level=logging.INFO
     )
     logger = logging.getLogger("train")
     logger.info("Start main_train execution ...")
@@ -172,6 +172,12 @@ if __name__ == '__main__':
 
     logger.debug("Start processing Frankfurt (Main) Hbf departures ...")
     _load_api_data(eva=8000105, current_time=now, board_type=BoardType.DEPARTURE)
+
+    logger.debug("Start processing Mannheim Hbf arrivals ...")
+    _load_api_data(eva=8000244, current_time=now, board_type=BoardType.ARRIVAL)
+
+    logger.debug("Start processing Mannheim Hbf departures ...")
+    _load_api_data(eva=8000244, current_time=now, board_type=BoardType.DEPARTURE)
 
     database.close()
     # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO

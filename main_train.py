@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 from enum import Enum
+from pytz import timezone
 
 import requests
 
@@ -83,9 +84,9 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
     for line in lines:
         # time - line
         if matches := re.fullmatch(r"(?P<hour>[0-2][0-9]):(?P<minute>[0-6][0-9])", string=line):
-            hour = matches.group("hour")
-            minute = matches.group("minute")
-            dataset["timestamp"] = current_time.strftime("%Y-%m-%dT") + hour + ":" + minute + ":00+01:00"  # it's +1 now
+            hour = int(matches.group("hour"))
+            minute = int(matches.group("minute"))
+            dataset["timestamp"] = current_time.replace(hour=hour, minute=minute, second=0, microsecond=0).isoformat()
 
         # connection - line
         elif matches := re.fullmatch(r"(?P<type>[A-Za-z]+)([ \t]*)(?P<line>[A-Z0-9]+)", string=line):
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     logger.info("Start main_train execution ...")
 
     # get now
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
 
     # setup counter
     global num_inserted

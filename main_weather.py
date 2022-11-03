@@ -1,14 +1,21 @@
 import datetime
 import logging
+from pytz import timezone
 
 import requests
 
 from database import Database
 
 
-# TODO comment
+def _save_to_db(db: Database, dataset: dict) -> None:
+    """
+    Save a captured dataset to the database.
 
-def save_to_db(db: Database, dataset: dict) -> None:
+    :param db: database to be used
+    :param dataset: dataset to be saved
+    :return: None
+    """
+
     try:
         logger.debug("Saving to database '%s'", dataset)
 
@@ -19,7 +26,7 @@ def save_to_db(db: Database, dataset: dict) -> None:
             "lon": dataset["lon"]
         }
 
-        # save (update or insert) the dataset to the database
+        # save (upsert) the dataset to the database
         result = database.upsert(collection=db.mongo_data_weather, query=keys, update=dataset)
 
         # update stats
@@ -34,15 +41,24 @@ def save_to_db(db: Database, dataset: dict) -> None:
         logger.exception("Given dataset missing key(s):")
 
 
-def load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> None:
+def _load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> None:
+    """
+    Load data from API and save it to the database.
+
+    :param lat: latitude of position
+    :param lon: longitude of position
+    :param current_time: current datetime
+    :return: None
+    """
+
     # request api
     url = "https://api.brightsky.dev/weather"
     params = {
         # date to look at ['YYYY-MM-DD']
         "date": current_time.strftime("%Y-%m-%d"),
-        # lon of city XX.XX
+        # lon of city [XX.XX]
         "lon": lon,
-        # lat of city XX.XX
+        # lat of city [XX.XX]
         "lat": lat,
         # timezone of city
         "tz": "Europe/Berlin"
@@ -53,20 +69,20 @@ def load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> No
     # request successful?
     if r.status_code != 200:
         logger.critical("Request return unexpected exit code '%s'", r.status_code)
-        assert False
+        assert False    # exit with a big bang
 
     # region process answer
     answer = r.json()
 
-    weather = answer['weather']  # get only weather data
+    # get only weather data
+    weather = answer['weather']
     logger.info("Result has %s elements", len(weather))
 
     # save processed dataset
     for dataset in weather:
-        dataset['lat'] = lat
-        dataset['lon'] = lon
-        save_to_db(db=database, dataset=dataset)
-
+        dataset["lat"] = lat
+        dataset["lon"] = lon
+        _save_to_db(db=database, dataset=dataset)
     # endregion
 
 
@@ -87,20 +103,19 @@ if __name__ == '__main__':
     logger.info("Start main_weather execution ...")
 
     # get now
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
 
-    # setup counter
-    global num_inserted
+    # setup global counter
     num_inserted = 0
-    global num_updated
     num_updated = 0
-    global num_unchanged
     num_unchanged = 0
 
     # setup database connection and load data
     database = Database()
+
     logger.debug("Start processing Frankfurt (Main) weather data ...")
-    load_api_data(lat=50.05, lon=8.6, current_time=now)
+    _load_api_data(lat=50.05, lon=8.6, current_time=now)
+
     database.close()
     # database.mongo_data_weather.delete_many({})  # delete all data from the db collection # TODO
 

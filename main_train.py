@@ -9,15 +9,23 @@ import requests
 from database import Database
 
 
-# TODO comment
-
-
 class BoardType(Enum):
+    """
+    Enum representing the possible board types.
+    """
     ARRIVAL = "arr"
     DEPARTURE = "dep"
 
 
-def save_to_db(db: Database, dataset: dict):
+def _save_to_db(db: Database, dataset: dict) -> None:
+    """
+    Save a captured dataset to the database.
+
+    :param db: database to be used
+    :param dataset: dataset to be saved
+    :return: None
+    """
+
     try:
         logger.debug("Saving to database '%s'", dataset)
 
@@ -30,7 +38,7 @@ def save_to_db(db: Database, dataset: dict):
             "con_line": dataset["con_line"]
         }
 
-        # save (update or insert) the dataset to the database
+        # save (upsert) the dataset to the database
         result = database.upsert(collection=db.mongo_data_train, query=keys, update=dataset)
 
         # update stats
@@ -43,10 +51,18 @@ def save_to_db(db: Database, dataset: dict):
 
     except KeyError:
         logger.exception("Given dataset missing key(s):")
-        print("Upsert Error")
 
 
-def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardType):
+def _load_api_data(eva: int, current_time: datetime.datetime, board_type: BoardType) -> None:
+    """
+    Load data from API and save it to the database.
+
+    :param eva: ID of the train station
+    :param current_time: current datetime
+    :param board_type: board type (arr or dep)
+    :return: None
+    """
+
     # request api
     url = "https://reiseauskunft.bahn.de/bin/bhftafel.exe/dn"
     params = {
@@ -69,7 +85,7 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
     # request successful?
     if r.status_code != 200:
         logger.critical("Request return unexpected exit code '%s'", r.status_code)
-        assert False
+        assert False    # exit with a big bang
 
     # region process answer
     answer = r.text
@@ -110,7 +126,7 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
                 logger.error("Not recognized changes line: '%s'", line)
 
             # save processed dataset
-            save_to_db(db=database, dataset=dataset)
+            _save_to_db(db=database, dataset=dataset)
 
             # reset dataset
             dataset = {
@@ -122,7 +138,6 @@ def load_api_data(eva: str, current_time: datetime.datetime, board_type: BoardTy
         else:
             logger.error("Not recognized line: '%s' with dataset '%s'", line, dataset)
     # endregion
-    # TODO save eva in dataset
 
 
 ###################################
@@ -144,20 +159,20 @@ if __name__ == '__main__':
     # get now
     now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
 
-    # setup counter
-    global num_inserted
+    # setup global counter
     num_inserted = 0
-    global num_updated
     num_updated = 0
-    global num_unchanged
     num_unchanged = 0
 
     # setup database connection and load data
     database = Database()
+
     logger.debug("Start processing Frankfurt (Main) Hbf arrivals ...")
-    load_api_data(eva="8000105", current_time=now, board_type=BoardType.ARRIVAL)
+    _load_api_data(eva=8000105, current_time=now, board_type=BoardType.ARRIVAL)
+
     logger.debug("Start processing Frankfurt (Main) Hbf departures ...")
-    load_api_data(eva="8000105", current_time=now, board_type=BoardType.DEPARTURE)
+    _load_api_data(eva=8000105, current_time=now, board_type=BoardType.DEPARTURE)
+
     database.close()
     # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 

@@ -88,7 +88,9 @@ def _load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> N
 
 ###################################
 # Main entry point of main_weather.py
-# call with "TODO Command cron?"
+# call with cronjob:
+# 0 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_weather.py
+# 30 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_weather.py
 ###################################
 if __name__ == '__main__':
     # setup logging

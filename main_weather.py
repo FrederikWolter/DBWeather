@@ -120,7 +120,6 @@ if __name__ == '__main__':
     _load_api_data(lat=49.5, lon=8.48, current_time=now)
 
     database.close()
-    # database.mongo_data_weather.delete_many({})  # delete all data from the db collection # TODO
 
     logger.info("finished: %s inserted, %s updated, %s unchanged", num_inserted, num_updated, num_unchanged)
     logger.info("###########################################")

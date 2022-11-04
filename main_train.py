@@ -180,7 +180,6 @@ if __name__ == '__main__':
     _load_api_data(eva=8000244, current_time=now, board_type=BoardType.DEPARTURE)
 
     database.close()
-    # database.mongo_data_train.delete_many({})  # delete all data from the db collection # TODO
 
     logger.info("finished: %s inserted, %s updated, %s unchanged", num_inserted, num_updated, num_unchanged)
     logger.info("###########################################")

@@ -142,7 +142,9 @@ def _load_api_data(eva: int, current_time: datetime.datetime, board_type: BoardT
 
 ###################################
 # Main entry point of main_train.py
-# call with "TODO Command cron?"
+# call with cronjob:
+# 0 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_train.py
+# 30 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_train.py
 ###################################
 if __name__ == '__main__':
     # setup logging

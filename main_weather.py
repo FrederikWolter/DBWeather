@@ -93,9 +93,14 @@ def _load_api_data(lat: float, lon: float, current_time: datetime.datetime) -> N
 # 30 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_weather.py
 ###################################
 if __name__ == '__main__':
+    # get now
+    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
+
+    logDate = now.strftime("%d-%m-%y")
+
     # setup logging
     logging.basicConfig(
-        filename='execution.log',
+        filename='execution_' + logDate + '.log',
         filemode="a",
         format='%(asctime)s %(levelname)-7s %(name)s: %(message)s',
         encoding='utf-8',
@@ -103,9 +108,6 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger("weather")
     logger.info("Start main_weather execution ...")
-
-    # get now
-    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
 
     # setup global counter
     num_inserted = 0

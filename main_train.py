@@ -147,9 +147,14 @@ def _load_api_data(eva: int, current_time: datetime.datetime, board_type: BoardT
 # 30 * * * * /usr/local/bin/python3.10 /home/bigdata/DBWeather/main_train.py
 ###################################
 if __name__ == '__main__':
+    # get now
+    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
+
+    logDate = now.strftime("%d-%m-%y")
+
     # setup logging
     logging.basicConfig(
-        filename='execution.log',
+        filename='execution_' + logDate + '.log',
         filemode="a",
         format='%(asctime)s %(levelname)-7s %(name)s: %(message)s',
         encoding='utf-8',
@@ -157,9 +162,6 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger("train")
     logger.info("Start main_train execution ...")
-
-    # get now
-    now = datetime.datetime.now(tz=timezone("Europe/Berlin"))
 
     # setup global counter
     num_inserted = 0
